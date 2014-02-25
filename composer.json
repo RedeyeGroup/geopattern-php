@@ -1,5 +1,5 @@
 {
-    "name": "redeyeventures/geopatterns",
+    "name": "redeyeventures/geopattern",
     "description": "Generate beautiful SVG patterns.",
     "type": "library",
     "keywords": ["svg", "pattern", "geometric", "background"],
@@ -12,8 +12,8 @@
         }
     ],
     "support": {
-        "source": "https://github.com/redeyeventures/geopatterns-php",
-        "issues": "https://github.com/redeyeventures/geopatterns-php/issues"
+        "source": "https://github.com/redeyeventures/geopattern-php",
+        "issues": "https://github.com/redeyeventures/geopattern-php/issues"
     },
     "autoload": {
         "psr-4": {

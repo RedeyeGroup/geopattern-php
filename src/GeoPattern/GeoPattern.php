@@ -58,6 +58,8 @@ class GeoPattern {
         // Set generator if provided. If not, leave null.
         if (isset($options['generator']))
             $this->setGenerator($options['generator']);
+
+        $this->svg = new SVG();
     }
 
     // Fluent Interfaces
@@ -88,7 +90,7 @@ class GeoPattern {
         throw new \InvalidArgumentException("$generator is not a valid generator type.");
     }
 
-    public function toSvgString()
+    public function toSVG()
     {
         $this->svg = new SVG();
         $this->generateBackground();
@@ -96,14 +98,14 @@ class GeoPattern {
         return (string) $this->svg;
     }
 
-    public function toBase64String()
+    public function toBase64()
     {
-        return base64_encode($this->toSvgString());
+        return base64_encode($this->toSVG());
     }
 
     public function toDataURI()
     {
-        return "data:image/svg+xml;base64,{$this->toBase64String()}";
+        return "data:image/svg+xml;base64,{$this->toBase64()}";
     }
 
     public function toDataURL()
@@ -112,9 +114,10 @@ class GeoPattern {
     }
 
     public function __toString() {
-        return $this->toSvgString();
+        return $this->toSVG();
     }
 
+    // Generators
     protected function generateBackground()
     {
         $hueOffset = $this->map($this->hexVal(14, 3), 0, 4095, 0, 359);
@@ -145,11 +148,9 @@ class GeoPattern {
 
         if (method_exists($this, $function))
             $this->$function();
-        else
-            $this->geoHexagons();
-            //throw new \UnexpectedValueException("The generator function $function does not exist.");
     }
 
+    // Pattern Makers
     protected function geoHexagons()
     {
         $scale = $this->hexVal(0, 1);
@@ -180,22 +181,22 @@ class GeoPattern {
 
                 // Add an extra one at top-right, for tiling.
                 if ($x == 0) {
-                    $onePointFiveSideLengthSixMinuxHalfHexWidth = 6 * $sideLength * 1.5 - $hexWidth / 2;
-                    $this->svg->addPolyline($hex, array_merge($styles, ['transform' => "translate($onePointFiveSideLengthSixMinuxHalfHexWidth, $dyMinusHalfHexHeight)"]));
+                    $onePointFiveSideLengthSixMinusHalfHexWidth = 6 * $sideLength * 1.5 - $hexWidth / 2;
+                    $this->svg->addPolyline($hex, array_merge($styles, ['transform' => "translate($onePointFiveSideLengthSixMinusHalfHexWidth, $dyMinusHalfHexHeight)"]));
                 }
 
                 // Add an extra row at the end that matches the first row, for tiling.
                 if ($y == 0) {
                     $dy2 = ($x % 2 == 0) ? (6 * $hexHeight) : (6 * $hexHeight + $hexHeight / 2);
-                    $dy2MinuxHalfHexHeight = $dy2 - $hexHeight / 2;
-                    $this->svg->addPolyline($hex, array_merge($styles, ['transform' => "translate($onePointFiveXSideLengthMinusHalfHexWidth, $dy2MinuxHalfHexHeight)"]));
+                    $dy2MinusHalfHexHeight = $dy2 - $hexHeight / 2;
+                    $this->svg->addPolyline($hex, array_merge($styles, ['transform' => "translate($onePointFiveXSideLengthMinusHalfHexWidth, $dy2MinusHalfHexHeight)"]));
                 }
 
                 // Add an extra one at bottom-right, for tiling.
                 if ($x == 0 && $y == 0) {
-                    $onePointFiveSideLengthSixMinuxHalfHexWidth = 6 * $sideLength * 1.5 - $hexWidth / 2;
+                    $onePointFiveSideLengthSixMinusHalfHexWidth = 6 * $sideLength * 1.5 - $hexWidth / 2;
                     $fiveHexHeightPlusHalfHexHeight = 5 * $hexHeight + $hexHeight / 2;
-                    $this->svg->addPolyline($hex, array_merge($styles, ['transform' => "translate($onePointFiveSideLengthSixMinuxHalfHexWidth, $fiveHexHeightPlusHalfHexHeight)"]));
+                    $this->svg->addPolyline($hex, array_merge($styles, ['transform' => "translate($onePointFiveSideLengthSixMinusHalfHexWidth, $fiveHexHeightPlusHalfHexHeight)"]));
                 }
 
                 $i++;
@@ -284,7 +285,731 @@ class GeoPattern {
 
     }
 
+    protected function geoPlusSigns()
+    {
+        $squareSize = $this->map($this->hexVal(0, 1), 0, 15, 10, 25);
+        $plusSize = $squareSize * 3;
+        $plusShape = $this->buildPlusShape($squareSize);
 
+        $this->svg->setWidth($squareSize*12)
+            ->setHeight($squareSize*12);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+                $dx = ($y % 2 == 0) ? 0 : 1;
+
+                $styles = [
+                    'fill' => $fill,
+                    'stroke' => self::STROKE_COLOR,
+                    'stroke-opacity' => self::STROKE_OPACITY,
+                    'style' => [
+                        'fill-opacity' => $opacity,
+                    ],
+                ];
+
+                $group = new Group();
+                $group->addItem($plusShape[0])
+                    ->addItem($plusShape[1]);
+
+                $t1 = $x * $plusSize - $x * $squareSize + $dx * $squareSize - $squareSize;
+                $t2 = $y * $plusSize - $y * $squareSize - $plusSize / 2;
+
+                $this->svg->addGroup($group, array_merge($styles, ['transform' => "translate($t1, $t2)"]));
+
+                // Add an extra column on the right for tiling.
+                if ($x == 0) {
+                    $xT1 = 4 * $plusSize - $x * $squareSize + $dx * $squareSize - $squareSize;
+                    $xT2 = $y * $plusSize - $y * $squareSize - $plusSize / 2;
+                    $this->svg->addGroup($group, array_merge($styles, ['transform' => "translate($xT1, $xT2)"]));
+                }
+
+                // Add an extra row on the bottom that matches the first row, for tiling.
+                if ($y == 0) {
+                    $yT1 = $x * $plusSize - $x * $squareSize + $dx * $squareSize - $squareSize;
+                    $yT2 = 4 * $plusSize - $y * $squareSize - $plusSize /2;
+                    $this->svg->addGroup($group, array_merge($styles, ['transform' => "translate($yT1, $yT2)"]));
+                }
+
+                // Add an extra one at top-right and bottom-right, for tiling.
+                if ($x == 0 && $y == 0) {
+                    $xyT1 = 4 * $plusSize - $x * $squareSize + $dx * $squareSize - $squareSize;
+                    $xyT2 = 4 * $plusSize - $y * $squareSize - $plusSize / 2;
+                    $this->svg->addGroup($group, array_merge($styles, ['transform' => "translate($xyT1, $xyT2)"]));
+                }
+
+                $i++;
+            }
+        }
+    }
+
+    protected function geoXes()
+    {
+        $squareSize = $this->map($this->hexVal(0, 1), 0, 15, 10, 25);
+        $xSize = $squareSize * 3 * 0.943;
+        $xShape = $this->buildPlusShape($squareSize);
+
+        $this->svg->setWidth($xSize*3)
+            ->setHeight($xSize*3);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+                $dy = ($x % 2 == 0) ? ($y * $xSize - $xSize * 0.5) : ($y * $xSize - $xSize * 0.5 + $xSize / 4);
+
+                $styles = [
+                    'fill' => $fill,
+                    'style' => [
+                        'opacity' => $opacity,
+                    ],
+                ];
+
+                $group = new Group();
+                $group->addItem($xShape[0])
+                    ->addItem($xShape[1]);
+
+                $t1 = $x * $xSize / 2 - $xSize / 2;
+                $t2 = $dy - $y * $xSize / 2;
+                $halfXSize = $xSize / 2;
+                $this->svg->addGroup($group, array_merge($styles, ['transform' => "translate($t1, $t2) rotate(45, $halfXSize, $halfXSize)"]));
+
+                // Add an extra column on the right for tiling.
+                if ($x == 0) {
+                    $xT1 = 6 * $xSize / 2 - $xSize / 2;
+                    $xT2 = $dy - $y * $xSize / 2;
+                    $this->svg->addGroup($group, array_merge($styles, ['transform' => "translate($xT1, $xT2) rotate(45, $halfXSize, $halfXSize)"]));
+                }
+
+                // Add an extra row on the bottom that matches the first row, for tiling.
+                if ($y == 0) {
+                    $dy = ($x % 2 == 0) ? (6 * $xSize - $xSize / 2) : (6 * $xSize - $xSize / 2 + $xSize / 4);
+                    $yT1 = $x * $xSize / 2 - $xSize / 2;
+                    $yT2 = $dy - 6 * $xSize / 2;
+                    $this->svg->addGroup($group, array_merge($styles, ['transform' => "translate($yT1, $yT2) rotate(45, $halfXSize, $halfXSize)"]));
+                }
+
+                // These can hang off the bottom, so put a row at the top for tiling.
+                if ($y == 5) {
+                    $y2T1 = $x * $xSize / 2 - $xSize / 2;
+                    $y2T2 = $dy - 11 * $xSize / 2;
+                    $this->svg->addGroup($group, array_merge($styles, ['transform' => "translate($y2T1, $y2T2) rotate(45, $halfXSize, $halfXSize)"]));
+                }
+
+                // Add an extra one at top-right and bottom-right, for tiling.
+                if ($x == 0 && $y == 0) {
+                    $xyT1 = 6 * $xSize / 2 - $xSize / 2;
+                    $xyT2 = $dy - 6 * $xSize / 2;
+                    $this->svg->addGroup($group, array_merge($styles, ['transform' => "translate($xyT1, $xyT2) rotate(45, $halfXSize, $halfXSize"]));
+                }
+
+                $i++;
+            }
+        }
+    }
+
+    protected function geoOverlappingCircles()
+    {
+        $scale = $this->hexVal(0, 1);
+        $diameter = $this->map($scale, 0, 15, 25, 200);
+        $radius = $diameter/2;
+
+        $this->svg->setWidth($radius*6)
+            ->setHeight($radius*6);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+                $styles = [
+                    'fill' => $fill,
+                    'style' => [
+                        'opacity' => $opacity,
+                    ],
+                ];
+
+                $this->svg->addCircle($x*$radius, $y*$radius, $radius, $styles);
+
+                // Add an extra one at top-right, for tiling.
+                if ($x == 0)
+                    $this->svg->addCircle(6*$radius, $y*$radius, $radius, $styles);
+
+                // Add an extra row at the end that matches the first row, for tiling.
+                if ($y == 0)
+                    $this->svg->addCircle($x*$radius, 6*$radius, $radius, $styles);
+
+                // Add an extra one at bottom-right, for tiling.
+                if ($x == 0 && $y == 0)
+                    $this->svg->addCircle(6*$radius, 6*$radius, $radius, $styles);
+
+                $i++;
+            }
+        }
+    }
+
+    protected function geoOctogons()
+    {
+        $squareSize = $this->map($this->hexVal(0, 1), 0, 15, 10, 60);
+        $tile = $this->buildOctogonShape($squareSize);
+
+        $this->svg->setWidth($squareSize*6)
+            ->setHeight($squareSize*6);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+
+                $xSquareSize = $x * $squareSize;
+                $ySquareSize = $y * $squareSize;
+
+                $this->svg->addPolyline($tile, [
+                    'fill' => $fill,
+                    'fill-opacity' => $opacity,
+                    'stroke' => self::STROKE_COLOR,
+                    'stroke-opacity' => self::STROKE_OPACITY,
+                    'transform' => "translate($xSquareSize, $ySquareSize)",
+                ]);
+
+                $i++;
+            }
+        }
+
+    }
+
+    protected function geoSquares()
+    {
+        $squareSize = $this->map($this->hexVal(0, 1), 0, 15, 10, 60);
+
+        $this->svg->setWidth($squareSize*6)
+            ->setHeight($squareSize*6);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+
+                $this->svg->addRectangle($x*$squareSize, $y*$squareSize, $squareSize, $squareSize, [
+                    'fill' => $fill,
+                    'fill-opacity' => $opacity,
+                    'stroke' => self::STROKE_COLOR,
+                    'stroke-opacity' => self::STROKE_OPACITY,
+                ]);
+
+                $i++;
+            }
+        }
+
+    }
+
+    protected function geoConcentricCircles()
+    {
+        $scale = $this->hexVal(0, 1);
+        $ringSize = $this->map($scale, 0, 15, 10, 60);
+        $strokeWidth = $ringSize / 5;
+
+        $this->svg->setWidth(($ringSize + $strokeWidth)*6)
+            ->setHeight(($ringSize + $strokeWidth)*6);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+
+                $cx = $x * $ringSize + $x * $strokeWidth + ($ringSize + $strokeWidth) / 2;
+                $cy = $y * $ringSize + $y * $strokeWidth + ($ringSize + $strokeWidth) / 2;
+                $halfRingSize = $ringSize / 2;
+
+                $this->svg->addCircle($cx, $cy, $halfRingSize, [
+                    'fill' => 'none',
+                    'stroke' => $fill,
+                    'style' => [
+                        'opacity' => $opacity,
+                        'stroke-width' => "{$strokeWidth}px",
+                    ],
+                ]);
+
+                $val = $this->hexVal(39-$i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+
+                $quarterRingSize = $ringSize / 4;
+
+                $this->svg->addCircle($cx, $cy, $quarterRingSize, [
+                    'fill' => $fill,
+                    'fill-opacity' => $opacity,
+                ]);
+
+                $i++;
+            }
+        }
+    }
+
+    protected function geoOverlappingRings()
+    {
+        $scale = $this->hexVal(0, 1);
+        $ringSize = $this->map($scale, 0, 15, 10, 60);
+        $strokeWidth = $ringSize / 4;
+
+        $this->svg->setWidth($ringSize*6)
+            ->setHeight($ringSize*6);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+
+                $styles = [
+                    'fill' => 'none',
+                    'stroke' => $fill,
+                    'style' => [
+                        'opacity' => $opacity,
+                        'stroke-width' => "{$strokeWidth}px",
+                    ],
+                ];
+
+                $ringSizeMinusHalfStrokeWidth = $ringSize - $strokeWidth / 2;
+
+                $this->svg->addCircle($x*$ringSize, $y*$ringSize, $ringSizeMinusHalfStrokeWidth, $styles);
+
+                // Add an extra one at top-right, for tiling.
+                if ($x == 0)
+                    $this->svg->addCircle(6*$ringSize, $y*$ringSize, $ringSizeMinusHalfStrokeWidth, $styles);
+
+                // Add an extra row at the end that matches the first row, for tiling.
+                if ($y == 0)
+                    $this->svg->addCircle($x*$ringSize, 6*$ringSize, $ringSizeMinusHalfStrokeWidth, $styles);
+
+                // Add an extra one at bottom-right, for tiling.
+                if ($x == 0 && $y == 0)
+                    $this->svg->addCircle(6*$ringSize, 6*$ringSize, $ringSizeMinusHalfStrokeWidth, $styles);
+
+                $i++;
+            }
+        }
+    }
+
+    protected function geoTriangles()
+    {
+        $scale = $this->hexVal(0, 1);
+        $sideLength = $this->map($scale, 0 ,15, 15, 80);
+        $triangleHeight = $sideLength / 2 * sqrt(3);
+        $triangle = $this->buildTriangleShape($sideLength, $triangleHeight);
+
+        $this->svg->setWidth($sideLength * 3)
+            ->setHeight($triangleHeight * 6);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+
+                $styles = [
+                    'fill' => $fill,
+                    'fill-opacity' => $opacity,
+                    'stroke' => self::STROKE_COLOR,
+                    'stroke-opacity' => self::STROKE_OPACITY,
+                ];
+
+                $rotation = '';
+                if ($y % 2 == 0)
+                    $rotation = ($x % 2 == 0) ? 180 : 0;
+                else
+                    $rotation = ($x % 2 != 0) ? 180 : 0;
+
+                $halfSideLength = $sideLength / 2;
+                $halfTriangleHeight = $triangleHeight / 2;
+                $yTriangleHeight = $triangleHeight * $y;
+
+                $t1 = $x * $sideLength * 0.5 - $sideLength / 2;
+                $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($t1, $yTriangleHeight) rotate($rotation, $halfSideLength, $halfTriangleHeight)"]));
+
+                // Add an extra one at top-right, for tiling.
+                if ($x == 0)
+                {
+                    $xT1 = 6 * $sideLength * 0.5 - $sideLength / 2;
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($xT1, $yTriangleHeight) rotate($rotation, $halfSideLength, $halfTriangleHeight)"]));
+                }
+
+                $i++;
+            }
+        }
+
+    }
+
+    protected function geoTrianglesRotated()
+    {
+        $scale = $this->hexVal(0, 1);
+        $sideLength = $this->map($scale, 0 ,15, 15, 80);
+        $triangleWidth = $sideLength / 2 * sqrt(3);
+        $triangle = $this->buildRotatedTriangleShape($sideLength, $triangleWidth);
+
+        $this->svg->setWidth($triangleWidth * 6)
+            ->setHeight($sideLength * 3);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+
+                $styles = [
+                    'fill' => $fill,
+                    'fill-opacity' => $opacity,
+                    'stroke' => self::STROKE_COLOR,
+                    'stroke-opacity' => self::STROKE_OPACITY,
+                ];
+
+                $rotation = '';
+                if ($y % 2 == 0)
+                    $rotation = ($x % 2 == 0) ? 180 : 0;
+                else
+                    $rotation = ($x % 2 != 0) ? 180 : 0;
+
+                $halfSideLength = $sideLength / 2;
+                $halfTriangleWidth = $triangleWidth / 2;
+                $xTriangleWidth = $x * $triangleWidth;
+
+                $t1 = $y * $sideLength * 0.5 - $sideLength / 2;
+                $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($xTriangleWidth, $t1) rotate($rotation, $halfTriangleWidth, $halfSideLength)"]));
+
+                // Add an extra one at top-right, for tiling.
+                if ($y == 0)
+                {
+                    $yT1 = 6 * $sideLength * 0.5 - $sideLength / 2;
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($xTriangleWidth, $yT1) rotate($rotation, $halfTriangleWidth, $halfSideLength)"]));
+                }
+
+                $i++;
+            }
+        }
+
+    }
+
+    // Have to fix.
+    protected function geoDiamonds()
+    {
+        $diamondWidth = $this->map($this->hexVal(0, 1), 0, 15, 10, 50);
+        $diamondHeight = $this->map($this->hexVal(1, 1), 0, 15, 10, 50);
+        $diamond = $this->buildDiamondShape($diamondWidth, $diamondHeight);
+
+        $this->svg->setWidth($diamondWidth*6)
+            ->setHeight($diamondHeight*3);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+
+                $styles = [
+                    'fill' => $fill,
+                    'fill-opacity' => $opacity,
+                    'stroke' => self::STROKE_COLOR,
+                    'stroke-opacity' => self::STROKE_OPACITY,
+                ];
+
+                $dx = ($y % 2 == 0) ? 0 : ($diamondWidth / 2);
+
+                $t1 = $x * $diamondWidth - $diamondWidth / 2 + $dx;
+                $t2 = $diamondHeight / 2 * $y - $diamondHeight / 2;
+                $this->svg->addPolyline($diamond, array_merge($styles, ['translate' => "translate($t1, $t2)"]));
+
+                // Add an extra one at top-right, for tiling.
+                if ($x == 0)
+                {
+                    $xT1 = 6 * $diamondWidth - $diamondWidth / 2 + $dx;
+                    $xT2 = $diamondHeight / 2 * $y - $diamondHeight / 2;
+                    $this->svg->addPolyline($diamond, array_merge($styles, ['translate' => "translate($xT1, $xT2)"]));
+                }
+
+                // Add an extra row at the end that matches the first row, for tiling.
+                if ($y == 0)
+                {
+                    $yT1 = $x * $diamondWidth - $diamondWidth / 2 + $dx;
+                    $yT2 = $diamondHeight / 2 * 6 - $diamondHeight / 2;
+                    $this->svg->addPolyline($diamond, array_merge($styles, ['translate' => "translate($yT1, $yT2)"]));
+                }
+
+                // Add an extra one at bottom-right, for tiling.
+                if ($x == 0 && $y == 0)
+                {
+                    $xyT1 = 6 * $diamondWidth - $diamondWidth / 2 + $dx;
+                    $xyT2 = $diamondHeight / 2 * 6 - $diamondHeight / 2;
+                    $this->svg->addPolyline($diamond, array_merge($styles, ['translate' => "translate($xyT1, $xyT2)"]));
+                }
+
+                $i++;
+            }
+        }
+
+    }
+
+    protected function geoNestedSquares()
+    {
+        $blockSize = $this->map($this->hexVal(0, 1), 0, 15, 4, 12);
+        $squareSize = $blockSize * 7;
+        $dimension = ($squareSize + $blockSize) * 6 + $blockSize * 6;
+
+        $this->svg->setWidth($dimension)
+            ->setHeight($dimension);
+
+        $i = 0;
+        for ($y = 0; $y <= 5; $y++) {
+            for ($x = 0; $x <= 5; $x++) {
+                $val = $this->hexVal($i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+
+                $styles = [
+                    'fill' => 'none',
+                    'stroke' => $fill,
+                    'style' => [
+                        'opacity' => $opacity,
+                        'stroke-width' => "{$blockSize}px",
+                    ],
+                ];
+
+                $rX = $x * $squareSize + $x * $blockSize * 2 + $blockSize / 2;
+                $rY = $y * $squareSize + $y * $blockSize * 2 + $blockSize / 2;
+
+                $this->svg->addRectangle($rX, $rY, $squareSize, $squareSize, $styles);
+
+                $val = $this->hexVal(39-$i, 1);
+                $opacity = $this->opacity($val);
+                $fill = $this->fillColor($val);
+
+                $styles = [
+                    'fill' => 'none',
+                    'stroke' => $fill,
+                    'style' => [
+                        'opacity' => $opacity,
+                        'stroke-width' => "{$blockSize}px",
+                    ],
+                ];
+
+                $rX2 = $x * $squareSize + $x * $blockSize * 2 + $blockSize / 2 + $blockSize * 2;
+                $rY2 = $y * $squareSize + $y * $blockSize * 2 + $blockSize / 2 + $blockSize * 2;
+
+                $this->svg->addRectangle($rX2, $rY2, $blockSize * 3, $blockSize * 3, $styles);
+
+                $i++;
+            }
+        }
+    }
+
+    protected function geoMosaicSquares()
+    {
+        $triangleSize = $this->map($this->hexVal(0, 1), 0, 15, 15, 50);
+
+        $this->svg->setWidth($triangleSize*8)
+            ->setHeight($triangleSize*8);
+
+        $i = 0;
+        for ($y = 0; $y <= 3; $y++) {
+            for ($x = 0; $x <= 3; $x++) {
+                if ($x % 2 == 0)
+                {
+                    if ($y % 2 == 0)
+                        $this->drawOuterMosaicTile($x*$triangleSize*2, $y*$triangleSize*2, $triangleSize, $this->hexVal($i, 1));
+                    else
+                        $this->drawInnerMosaicTile($x*$triangleSize*2, $y*$triangleSize*2, $triangleSize, [$this->hexVal($i, 1), $this->hexVal($i+1, 1)]);
+                }
+                else
+                {
+                    if ($y % 2 == 0)
+                        $this->drawInnerMosaicTile($x*$triangleSize*2, $y*$triangleSize*2, $triangleSize, [$this->hexVal($i, 1), $this->hexVal($i+1, 1)]);
+                    else
+                        $this->drawOuterMosaicTile($x*$triangleSize*2, $y*$triangleSize*2, $triangleSize, $this->hexVal($i, 1));
+                }
+                $i++;
+            }
+        }
+
+    }
+
+    protected function geoPlaid()
+    {
+        $height = 0;
+        $width = 0;
+
+        // Horizontal Stripes
+        $i = 0;
+        $times = 0;
+        while ($times++ <= 18)
+        {
+            $space = $this->hexVal($i, 1);
+            $height += $space + 5;
+
+            $val = $this->hexVal($i+1, 1);
+            $opacity = $this->opacity($val);
+            $fill = $this->fillColor($val);
+            $stripeHeight = $val + 5;
+
+            $this->svg->addRectangle(0, $height, "100%", $stripeHeight, [
+                'opacity' => $opacity,
+                'fill' => $fill,
+            ]);
+            $height += $stripeHeight;
+            $i += 2;
+        }
+
+        // Vertical Stripes
+        $i = 0;
+        $times = 0;
+        while ($times++ <= 18)
+        {
+            $space = $this->hexVal($i, 1);
+            $width += $space + 5;
+
+            $val = $this->hexVal($i+1, 1);
+            $opacity = $this->opacity($val);
+            $fill = $this->fillColor($val);
+            $stripeWidth = $val + 5;
+
+            $this->svg->addRectangle($width, 0, $stripeWidth, "100%", [
+                'opacity' => $opacity,
+                'fill' => $fill,
+            ]);
+            $width += $stripeWidth;
+            $i += 2;
+        }
+
+        $this->svg->setWidth($width)
+            ->setHeight($height);
+
+    }
+
+    protected function geoTessellation()
+    {
+        $sideLength = $this->map($this->hexVal(0, 1), 0, 15, 5, 40);
+        $hexHeight = $sideLength * sqrt(3);
+        $hexWidth = $sideLength * 2;
+        $triangleHeight = $sideLength / 2 * sqrt(3);
+        $triangle = $this->buildRotatedTriangleShape($sideLength, $triangleHeight);
+        $tileWidth = $sideLength * 3 + $triangleHeight * 2;
+        $tileHeight = ($hexHeight * 2) + ($sideLength * 2);
+
+        $this->svg->setWidth($tileWidth)
+            ->setHeight($tileHeight);
+
+        // Doing these variables up here, so we only have to calculate them once.
+        $halfSideLength = $sideLength / 2;
+        $negativeHalfSideLength = -$sideLength / 2;
+        $halfTriangleHeight = $triangleHeight / 2;
+        $halfHexHeight = $hexHeight / 2;
+        $tileHeightPlusHalfSideLength = $tileHeight + $sideLength / 2;
+        $halfTileHeightMinusHalfSideLength = $tileHeight / 2 - $sideLength / 2;
+        $halfTileWidthPlusHalfSideLength = $tileWidth / 2 + $sideLength / 2;
+        $tileWidthMinusHalfTileWidthMinusHalfSideLength = $tileWidth - $tileWidth/2 - $sideLength/2;
+        $tileWidthMinusHalfSideLength = $tileWidth - $sideLength / 2;
+        $tileHeightMinusHalfHexHeight = $tileHeight - $hexHeight / 2;
+        $negativeTileWidthPlusHalfSideLength = -$tileWidth + $sideLength / 2;
+        $halfTileHeightMinusHalfSideLengthMinusSideLength = $tileHeight/2-$sideLength/2-$sideLength;
+        $negativeTileHeightPlusHalfTileHeightMinusHalfSideLengthMinusSideLength = -$tileHeight+$tileHeight/2-$sideLength/2-$sideLength;
+        $negativeTileHeightPlusHalfSideLength = -$tileHeight + $sideLength / 2;
+        for ($i = 0; $i <= 19; $i++) {
+            $val = $this->hexVal($i, 1);
+            $opacity = $this->opacity($val);
+            $fill = $this->fillColor($val);
+
+            $styles = [
+                'stroke' => self::STROKE_COLOR,
+                'stroke-opacity' => self::STROKE_OPACITY,
+                'fill' => $fill,
+                'fill-opacity' => $opacity,
+                'stroke-width' => 1,
+            ];
+
+            switch ($i) {
+                case 0: # all 4 corners
+                    $this->svg->addRectangle(-$sideLength/2, -$sideLength/2, $sideLength, $sideLength, $styles);
+                    $this->svg->addRectangle($tileWidth-$sideLength/2, -$sideLength/2, $sideLength, $sideLength, $styles);
+                    $this->svg->addRectangle(-$sideLength/2, $tileHeight-$sideLength/2, $sideLength, $sideLength, $styles);
+                    $this->svg->addRectangle($tileWidth-$sideLength/2, $tileHeight-$sideLength/2, $sideLength, $sideLength, $styles);
+                    break;
+                case 1: # center / top square
+                    $this->svg->addRectangle($hexWidth/2+$triangleHeight, $hexHeight/2, $sideLength, $sideLength, $styles);
+                    break;
+                case 2: # side squares
+                    $this->svg->addRectangle(-$sideLength/2, $tileHeight/2-$sideLength/2, $sideLength, $sideLength, $styles);
+                    $this->svg->addRectangle($tileWidth-$sideLength/2, $tileHeight/2-$sideLength/2, $sideLength, $sideLength, $styles);
+                    break;
+                case 3: # center / bottom square
+                    $this->svg->addRectangle($hexWidth/2+$triangleHeight, $hexHeight*1.5+$sideLength, $sideLength, $sideLength, $styles);
+                    break;
+                case 4: # left top / bottom triangle
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($halfSideLength, $negativeHalfSideLength) rotate(0, $halfSideLength, $halfTriangleHeight)"]));
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($halfSideLength, $tileHeightPlusHalfSideLength) rotate(0, $halfSideLength, $halfTriangleHeight) scale(1, -1)"]));
+                    break;
+                case 5: # right top / bottom triangle
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($tileWidthMinusHalfSideLength, $negativeHalfSideLength) rotate(0, $halfSideLength, $halfTriangleHeight) scale(-1, 1)"]));
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($tileWidthMinusHalfSideLength, $tileHeightPlusHalfSideLength) rotate(0, $halfSideLength, $halfTriangleHeight) scale(-1, -1)"]));
+                    break;
+                case 6: # center / top / right triangle
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($halfTileWidthPlusHalfSideLength, $halfHexHeight)"]));
+                    break;
+                case 7: # center / top / left triangle
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($tileWidthMinusHalfTileWidthMinusHalfSideLength, $halfHexHeight) scale(-1, 1)"]));
+                    break;
+                case 8: # center / bottom / right triangle
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($halfTileWidthPlusHalfSideLength, $tileHeightMinusHalfHexHeight) scale(1, -1)"]));
+                    break;
+                case 9: # center / bottom / left triangle
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($tileWidthMinusHalfTileWidthMinusHalfSideLength, $tileHeightMinusHalfHexHeight) scale(-1, -1)"]));
+                    break;
+                case 10: # left / middle triangle
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($halfSideLength, $halfTileHeightMinusHalfSideLength)"]));
+                    break;
+                case 11: # right / middle triangle
+                    $this->svg->addPolyline($triangle, array_merge($styles, ['transform' => "translate($tileWidthMinusHalfSideLength, $halfTileHeightMinusHalfSideLength) scale(-1, 1)"]));
+                    break;
+                case 12: # left / top square
+                    $this->svg->addRectangle(0, 0, $sideLength, $sideLength, array_merge($styles, ['transform' => "translate($halfSideLength, $halfSideLength) rotate(-30, 0, 0)"]));
+                    break;
+                case 13: # right / top square
+                    $this->svg->addRectangle(0, 0, $sideLength, $sideLength, array_merge($styles, ['transform' => "scale(-1, 1) translate($negativeTileWidthPlusHalfSideLength, $halfSideLength) rotate(-30, 0, 0)"]));
+                    break;
+                case 14: # left / center-top square
+                    $this->svg->addRectangle(0, 0, $sideLength, $sideLength, array_merge($styles, ['transform' => "translate($halfSideLength, $halfTileHeightMinusHalfSideLengthMinusSideLength) rotate(30, 0, $sideLength)"]));
+                    break;
+                case 15: # right / center-top square
+                    $this->svg->addRectangle(0, 0, $sideLength, $sideLength, array_merge($styles, ['transform' => "scale(-1, 1) translate($negativeTileWidthPlusHalfSideLength, $halfTileHeightMinusHalfSideLengthMinusSideLength) rotate(30, 0, $sideLength)"]));
+                    break;
+                case 16: # left / center-top square
+                    $this->svg->addRectangle(0, 0, $sideLength, $sideLength, array_merge($styles, ['transform' => "scale(1, -1) translate($halfSideLength, $negativeTileHeightPlusHalfTileHeightMinusHalfSideLengthMinusSideLength) rotate(30, 0, $sideLength)"]));
+                    break;
+                case 17: # right / center-bottom square
+                    $this->svg->addRectangle(0, 0, $sideLength, $sideLength, array_merge($styles, ['transform' => "scale(-1, -1) translate($negativeTileWidthPlusHalfSideLength, $negativeTileHeightPlusHalfTileHeightMinusHalfSideLengthMinusSideLength) rotate(30, 0, $sideLength)"]));
+                    break;
+                case 18: # left / bottom square
+                    $this->svg->addRectangle(0, 0, $sideLength, $sideLength, array_merge($styles, ['transform' => "scale(1, -1) translate($halfSideLength, $negativeTileHeightPlusHalfSideLength) rotate(-30, 0, 0)"]));
+                    break;
+                case 19: # right / bottom square
+                    $this->svg->addRectangle(0, 0, $sideLength, $sideLength, array_merge($styles, ['transform' => "scale(-1, -1) translate($negativeTileWidthPlusHalfSideLength, $negativeTileHeightPlusHalfSideLength) rotate(-30, 0, 0)"]));
+                    break;
+            }
+        }
+    }
 
     // build* functions
     protected function buildChevronShape($width, $height)
