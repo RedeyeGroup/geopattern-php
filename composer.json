@@ -1,20 +1,19 @@
 {
-    "name": "redeyeventures/geopattern",
+    "name": "redeyeventures/geopatterns",
     "description": "Generate beautiful SVG patterns.",
     "type": "library",
     "keywords": ["svg", "pattern", "geometric", "background"],
-    "homepage": "http://redeyeventures.github.io/geopattern",
     "license": "MIT",
     "authors": [
         {
             "name": "Anand Capur",
             "email": "anand@redeyeventures.com",
-            "homepage": "http://www.redeyeventures.com"
+            "homepage": "http://redeyeventures.com"
         }
     ],
     "support": {
-        "source": "http://github.com/redeyeventures/geopattern",
-        "issues": "http://github.com/redeyeventures/geopattern/issues"
+        "source": "http://github.com/redeyeventures/geopatterns-php",
+        "issues": "http://github.com/redeyeventures/geopatterns-php/issues"
     },
     "autoload": {
         "psr-4": {
