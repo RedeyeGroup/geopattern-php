@@ -12,8 +12,8 @@
         }
     ],
     "support": {
-        "source": "http://github.com/redeyeventures/geopatterns-php",
-        "issues": "http://github.com/redeyeventures/geopatterns-php/issues"
+        "source": "https://github.com/redeyeventures/geopatterns-php",
+        "issues": "https://github.com/redeyeventures/geopatterns-php/issues"
     },
     "autoload": {
         "psr-4": {
