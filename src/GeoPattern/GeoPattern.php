@@ -704,7 +704,6 @@ class GeoPattern {
 
     }
 
-    // Have to fix.
     protected function geoDiamonds()
     {
         $diamondWidth = $this->map($this->hexVal(0, 1), 0, 15, 10, 50);
@@ -732,14 +731,14 @@ class GeoPattern {
 
                 $t1 = $x * $diamondWidth - $diamondWidth / 2 + $dx;
                 $t2 = $diamondHeight / 2 * $y - $diamondHeight / 2;
-                $this->svg->addPolyline($diamond, array_merge($styles, ['translate' => "translate($t1, $t2)"]));
+                $this->svg->addPolyline($diamond, array_merge($styles, ['transform' => "translate($t1, $t2)"]));
 
                 // Add an extra one at top-right, for tiling.
                 if ($x == 0)
                 {
                     $xT1 = 6 * $diamondWidth - $diamondWidth / 2 + $dx;
                     $xT2 = $diamondHeight / 2 * $y - $diamondHeight / 2;
-                    $this->svg->addPolyline($diamond, array_merge($styles, ['translate' => "translate($xT1, $xT2)"]));
+                    $this->svg->addPolyline($diamond, array_merge($styles, ['transform' => "translate($xT1, $xT2)"]));
                 }
 
                 // Add an extra row at the end that matches the first row, for tiling.
@@ -747,7 +746,7 @@ class GeoPattern {
                 {
                     $yT1 = $x * $diamondWidth - $diamondWidth / 2 + $dx;
                     $yT2 = $diamondHeight / 2 * 6 - $diamondHeight / 2;
-                    $this->svg->addPolyline($diamond, array_merge($styles, ['translate' => "translate($yT1, $yT2)"]));
+                    $this->svg->addPolyline($diamond, array_merge($styles, ['transform' => "translate($yT1, $yT2)"]));
                 }
 
                 // Add an extra one at bottom-right, for tiling.
@@ -755,13 +754,12 @@ class GeoPattern {
                 {
                     $xyT1 = 6 * $diamondWidth - $diamondWidth / 2 + $dx;
                     $xyT2 = $diamondHeight / 2 * 6 - $diamondHeight / 2;
-                    $this->svg->addPolyline($diamond, array_merge($styles, ['translate' => "translate($xyT1, $xyT2)"]));
+                    $this->svg->addPolyline($diamond, array_merge($styles, ['transform' => "translate($xyT1, $xyT2)"]));
                 }
 
                 $i++;
             }
         }
-
     }
 
     protected function geoNestedSquares()
