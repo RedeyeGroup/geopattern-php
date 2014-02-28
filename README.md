@@ -19,6 +19,18 @@ And then run:
 
     $ composer update
 
+## Installation (without composer)
+
+Download or clone the `src` directory from GitHub.
+
+Rename the `src` folder to `GeoPattern` and put it somewhere your app can access it from.
+
+Add this line to your code:
+
+    require_once('path/to/folder/geopattern_loader.php');
+
+You can then follow the usage instructions below.
+
 ## Usage
 
 Make a new pattern:
