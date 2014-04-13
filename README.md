@@ -38,9 +38,13 @@ Make a new pattern:
     $geopattern = new \RedeyeVentures\GeoPattern\GeoPattern();
     $geopattern->setString('Mastering Markdown');
 
-To specify a base background color:
+To specify a base background color (with a hue and saturation that adjusts depending on the string):
 
-    $geopattern->setBaseColor('#fc0');
+    $geopattern->setBaseColor('#ffcc00');
+
+To use a specific background color (w/o any hue or saturation adjustments):
+
+    $geopattern->setColor('#ffcc00');
 
 To use a specific [pattern generator](#available-patterns):
 
@@ -67,7 +71,7 @@ You can use the data URL string to set the background:
     <div style="background-image: {$dataURL)"></div>
 
 The `setString`, `setBaseColor`, `setGenerator` methods are chainable.
-You can also pass an array to the GeoPattern constructor containing the `string`, `baseColor`, and/or `generator` values.
+You can also pass an array to the GeoPattern constructor containing the `string`, `baseColor`, `color`, and/or `generator` values.
 
 If the GeoPattern object is cast as a string, it will provide the SVG string.
 
