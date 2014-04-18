@@ -24,7 +24,7 @@ And then run:
 Make a new pattern:
 
     $geopattern = new GeoPattern\GeoPattern();
-    $geopattern->setString('Mastering Markdown');
+    $geopattern->setString('Make me a SVGandiwch now.');
 
 To specify a base background color:
 
@@ -57,7 +57,29 @@ You can use the data URL string to set the background:
 The `setString`, `setBaseColor`, `setGenerator` methods are chainable.
 You can also pass an array to the GeoPattern constructor containing the `string`, `baseColor`, and/or `generator` values.
 
-If the GeoPattern object is cast as a string, it will provide the SVG string.
+If the GeoPattern object is casted as a string, it will provide the SVG string result.
+
+## Laravel 4.x
+
+GeoPattern provides support for Laravel usage. 
+
+Add `'GeoPattern\ServiceProvider',` to the list of `providers` in the `app/config/app.php` configuration file.
+
+Add `'GeoPattern'      => 'GeoPattern\Facades\GeoPattern',` in the list of `aliases` in the `app/config/app.php` configuration file.
+
+You will then be able to use GeoPattern like this:
+
+````php
+GeoPattern::setString('Make me a SVGandiwch now.');
+GeoPattern::setBaseColor('#FFCC00');
+
+$response = Response::make(GeoPattern::toSVG(), 200);
+$response->header(
+    'content-type',
+    'image/svg+xml'
+);
+return $response;
+````
 
 ## Original Project
 
