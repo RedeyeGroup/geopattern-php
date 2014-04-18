@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Facade;
 
-class Captcha extends Facade
+class GeoPattern extends Facade
 {
     /**
      * Get the registered name of the component.
