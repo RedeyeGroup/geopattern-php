@@ -1,4 +1,4 @@
-GeoPattern [![Build Status](https://travis-ci.org/redeyeventures/geopattern-php.png?branch=master)](https://travis-ci.org/redeyeventures/geopattern-php)
+GeoPattern [![Build Status](https://travis-ci.org/mauris/geopattern-php.png?branch=master)](https://travis-ci.org/mauris/geopattern-php)
 ==========
 
 This is a PHP port of [jasonlong/geo_pattern](https://github.com/jasonlong/geo_pattern).
@@ -23,7 +23,7 @@ And then run:
 
 Make a new pattern:
 
-    $geopattern = new \RedeyeVentures\GeoPattern\GeoPattern();
+    $geopattern = new GeoPattern\GeoPattern();
     $geopattern->setString('Mastering Markdown');
 
 To specify a base background color:
