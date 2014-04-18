@@ -17,19 +17,7 @@ Add this line to the require section of your composer.json file:
 
 And then run:
 
-    $ composer update
-
-## Installation (without composer)
-
-Download or clone the `src` directory from GitHub.
-
-Rename the `src` folder to `GeoPattern` and put it somewhere your app can access it from.
-
-Add this line to your code:
-
-    require_once('path/to/folder/geopattern_loader.php');
-
-You can then follow the usage instructions below.
+    $ composer install
 
 ## Usage
 
@@ -70,14 +58,6 @@ The `setString`, `setBaseColor`, `setGenerator` methods are chainable.
 You can also pass an array to the GeoPattern constructor containing the `string`, `baseColor`, and/or `generator` values.
 
 If the GeoPattern object is cast as a string, it will provide the SVG string.
-
-## Contributing
-
-1. Fork it ( http://github.com/redeyeventures/geopattern-php/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
 
 ## Original Project
 
