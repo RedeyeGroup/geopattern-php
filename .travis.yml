@@ -1,13 +1,19 @@
-language: php
+language: "php"
 
 php:
-  - 5.5
-  - 5.4
+  - "5.3"
+  - "5.4"
+  - "5.5"
   - hhvm
 
-matrix:
-  allow_failures:
-    - php: hhvm
-
 before_script:
-    - composer install --dev --prefer-source
+  - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - "curl -s http://getcomposer.org/installer | php && php composer.phar install --prefer-source --no-interaction --dev"
+  - "pyrus install pear/PHP_CodeSniffer && phpenv rehash"
+
+script:
+    - "phpunit -c test"
+    - "phpcs --encoding=utf-8 --extensions=php --standard=test/phpcs.xml -nsp ./"
+
+after_script:
+  - "wget --quiet http://mauris.sg/bin/pdc.phar && php pdc.phar src"
