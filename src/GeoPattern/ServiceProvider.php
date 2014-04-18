@@ -1,4 +1,4 @@
-<?php namespace GeopPattern;
+<?php namespace GeoPattern;
 
 use Illuminate\Support\ServiceProvider as Base;
 
