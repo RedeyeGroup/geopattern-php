@@ -6,7 +6,7 @@ abstract class Base
     protected $elements;
     protected $args;
 
-    function __construct($args)
+    public function __construct($args)
     {
         $this->args = $args;
     }
@@ -14,8 +14,7 @@ abstract class Base
     public function elementsToString()
     {
         $string = ' ';
-        foreach ($this->elements as $key => $value)
-        {
+        foreach ($this->elements as $key => $value) {
             $string .= "$key=\"$value\" ";
         }
         return $string;
@@ -24,19 +23,14 @@ abstract class Base
     public function argsToString()
     {
         $string = '';
-        foreach ($this->args as $key => $value)
-        {
-            if (is_array($value))
-            {
+        foreach ($this->args as $key => $value) {
+            if (is_array($value)) {
                 $string .= "$key=\"";
-                foreach ($value as $k => $v)
-                {
+                foreach ($value as $k => $v) {
                     $string .= "$k:$v;";
                 }
                 $string .= '" ';
-            }
-            else
-            {
+            } else {
                 $string .= "$key=\"$value\" ";
             }
         }
@@ -48,7 +42,7 @@ abstract class Base
         return "<{$this->tag}{$this->elementsToString()}{$this->argsToString()}/>";
     }
 
-    function __toString()
+    public function __toString()
     {
         return $this->getString();
     }
