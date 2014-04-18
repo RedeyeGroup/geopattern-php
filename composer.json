@@ -2,7 +2,7 @@
     "name": "mauris/geopattern",
     "description": "Generate beautiful SVG patterns.",
     "type": "library",
-    "keywords": ["svg", "pattern", "geometric", "background"],
+    "keywords": ["laravel", "svg", "pattern", "geometric", "background"],
     "license": "MIT",
     "authors": [
         {
