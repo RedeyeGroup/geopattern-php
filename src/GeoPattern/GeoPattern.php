@@ -1,8 +1,8 @@
-<?php namespace RedeyeVentures\GeoPattern;
+<?php namespace GeoPattern;
 
-use RedeyeVentures\GeoPattern\SVGElements\Polyline;
-use RedeyeVentures\GeoPattern\SVGElements\Rectangle;
-use RedeyeVentures\GeoPattern\SVGElements\Group;
+use GeoPattern\SVGElements\Polyline;
+use GeoPattern\SVGElements\Rectangle;
+use GeoPattern\SVGElements\Group;
 
 class GeoPattern {
 

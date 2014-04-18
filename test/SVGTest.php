@@ -1,5 +1,5 @@
 <?php
-use RedeyeVentures\GeoPattern\SVG;
+use GeoPattern\SVG;
 
 class SVGTest extends PHPUnit_Framework_TestCase
 {

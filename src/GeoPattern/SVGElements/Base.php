@@ -1,4 +1,4 @@
-<?php namespace RedeyeVentures\GeoPattern\SVGElements;
+<?php namespace GeoPattern\SVGElements;
 
 abstract class Base
 {
