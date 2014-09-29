@@ -76,6 +76,14 @@ class GeoPattern {
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getString()
+    {
+        return $this->string;
+    }
+
     public function setBaseColor($baseColor)
     {
         if(preg_match('/^#[a-f0-9]{6}$/i', $baseColor)) //hex color is valid

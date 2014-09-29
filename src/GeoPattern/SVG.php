@@ -33,7 +33,7 @@ class SVG {
 
     protected function getSvgHeader()
     {
-        return "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{$this->width}\" height=\"{$this->height}\">";
+        return "<?xml version=\"1.0\"?><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{$this->width}\" height=\"{$this->height}\">";
     }
 
     protected function getSvgFooter()
