@@ -13,7 +13,7 @@ See the [GitHub Guides](http://guides.github.com) site as an example of what thi
 
 Add this line to the require section of your composer.json file:
 
-    "redeyeventures/geopattern": "1.0.*"
+    "redeyeventures/geopattern": "1.1.*"
 
 And then run:
 
