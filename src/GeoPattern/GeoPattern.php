@@ -97,8 +97,8 @@ class GeoPattern
 
     public function setColor($color)
     {
-        if(preg_match('/^#[a-f0-9]{6}$/i', $color)) //hex color is valid
-        {
+        //hex color is valid
+        if (preg_match('/^#[a-f0-9]{6}$/i', $color)) {
             $this->color = $color;
             return $this;
         }
@@ -160,10 +160,11 @@ class GeoPattern
             $baseColor['s'] = $baseColor['s'] - $satOffset/100;
         }
 
-        if (isset($color))
+        if (isset($color)) {
             $rgb = $this->hexToRGB($color);
-        else
+        } else {
             $rgb = $this->hslToRGB($baseColor['h'], $baseColor['s'], $baseColor['l']);
+        }
 
         $this->svg->addRectangle(0, 0, "100%", "100%", array('fill' => "rgb({$rgb['r']}, {$rgb['g']}, {$rgb['b']})"));
     }
