@@ -13,30 +13,18 @@ See the [GitHub Guides](http://guides.github.com) site as an example of what thi
 
 Add this line to the require section of your composer.json file:
 
-    "redeyeventures/geopattern": "1.1.*"
+    "redeyeventures/geopattern": "1.2.*"
 
 And then run:
 
-    $ composer update
-
-## Installation (without composer)
-
-Download or clone the `src` directory from GitHub.
-
-Rename the `src` folder to `GeoPattern` and put it somewhere your app can access it from.
-
-Add this line to your code:
-
-    require_once('path/to/folder/geopattern_loader.php');
-
-You can then follow the usage instructions below.
+    $ composer install
 
 ## Usage
 
 Make a new pattern:
 
-    $geopattern = new \RedeyeVentures\GeoPattern\GeoPattern();
-    $geopattern->setString('Mastering Markdown');
+    $geopattern = new GeoPattern\GeoPattern();
+    $geopattern->setString('Make me a SVGandiwch now.');
 
 To specify a base background color (with a hue and saturation that adjusts depending on the string):
 
@@ -73,10 +61,30 @@ You can use the data URL string to set the background:
 The `setString`, `setBaseColor`, `setGenerator` methods are chainable.
 You can also pass an array to the GeoPattern constructor containing the `string`, `baseColor`, `color`, and/or `generator` values.
 
-If the GeoPattern object is cast as a string, it will provide the SVG string.
+If the GeoPattern object is casted as a string, it will provide the SVG string result.
 
+## Laravel 4.x
 ## Contributing
 
+GeoPattern provides support for Laravel usage. 
+
+Add `'GeoPattern\ServiceProvider',` to the list of `providers` in the `app/config/app.php` configuration file.
+
+Add `'GeoPattern'      => 'GeoPattern\Facades\GeoPattern',` in the list of `aliases` in the `app/config/app.php` configuration file.
+
+You will then be able to use GeoPattern like this:
+
+````php
+GeoPattern::setString('Make me a SVGandiwch now.');
+GeoPattern::setBaseColor('#FFCC00');
+
+$response = Response::make(GeoPattern::toSVG(), 200);
+$response->header(
+    'content-type',
+    'image/svg+xml'
+);
+return $response;
+````
 1. Fork it ( http://github.com/redeyeventures/geopattern-php/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)

@@ -1,14 +1,14 @@
-<?php namespace RedeyeVentures\GeoPattern\SVGElements;
+<?php namespace GeoPattern\SVGElements;
 
 class Polyline extends Base
 {
     protected $tag = 'polyline';
 
-    function __construct($points, $args=array())
+    public function __construct($points, $args = array())
     {
-        $this->elements = [
+        $this->elements = array(
             'points' => $points,
-        ];
+        );
         parent::__construct($args);
     }
 }
