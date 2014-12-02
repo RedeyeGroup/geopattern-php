@@ -1,4 +1,4 @@
-GeoPattern [![Build Status](https://travis-ci.org/mauris/geopattern-php.png?branch=master)](https://travis-ci.org/mauris/geopattern-php)
+GeoPattern [![Build Status](https://travis-ci.org/redeyeventures/geopattern-php.png?branch=master)](https://travis-ci.org/redeyeventures/geopattern-php)
 ==========
 
 This is a PHP port of [jasonlong/geo_pattern](https://github.com/jasonlong/geo_pattern).
@@ -26,9 +26,13 @@ Make a new pattern:
     $geopattern = new GeoPattern\GeoPattern();
     $geopattern->setString('Make me a SVGandiwch now.');
 
-To specify a base background color:
+To specify a base background color (with a hue and saturation that adjusts depending on the string):
 
-    $geopattern->setBaseColor('#fc0');
+    $geopattern->setBaseColor('#ffcc00');
+
+To use a specific background color (w/o any hue or saturation adjustments):
+
+    $geopattern->setColor('#ffcc00');
 
 To use a specific [pattern generator](#available-patterns):
 
@@ -55,11 +59,12 @@ You can use the data URL string to set the background:
     <div style="background-image: {$dataURL)"></div>
 
 The `setString`, `setBaseColor`, `setGenerator` methods are chainable.
-You can also pass an array to the GeoPattern constructor containing the `string`, `baseColor`, and/or `generator` values.
+You can also pass an array to the GeoPattern constructor containing the `string`, `baseColor`, `color`, and/or `generator` values.
 
 If the GeoPattern object is casted as a string, it will provide the SVG string result.
 
 ## Laravel 4.x
+## Contributing
 
 GeoPattern provides support for Laravel usage. 
 
@@ -80,6 +85,11 @@ $response->header(
 );
 return $response;
 ````
+1. Fork it ( http://github.com/redeyeventures/geopattern-php/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
 
 ## Original Project
 

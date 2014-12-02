@@ -8,6 +8,7 @@ class GeoPattern
 {
     protected $string;
     protected $baseColor;
+    protected $color;
     protected $generator;
 
     protected $hash;
@@ -55,6 +56,11 @@ class GeoPattern
             $this->setBaseColor('#933c3c');
         }
 
+        // Set color if provided.
+        if (isset($options['color'])) {
+            $this->setColor($options['color']);
+        }
+
         // Set generator if provided. If not, leave null.
         if (isset($options['generator'])) {
             $this->setGenerator($options['generator']);
@@ -71,6 +77,14 @@ class GeoPattern
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getString()
+    {
+        return $this->string;
+    }
+
     public function setBaseColor($baseColor)
     {
         //hex color is valid
@@ -79,6 +93,16 @@ class GeoPattern
             return $this;
         }
         throw new \InvalidArgumentException("$baseColor is not a valid hex color.");
+    }
+
+    public function setColor($color)
+    {
+        if(preg_match('/^#[a-f0-9]{6}$/i', $color)) //hex color is valid
+        {
+            $this->color = $color;
+            return $this;
+        }
+        throw new \InvalidArgumentException("$color is not a valid hex color.");
     }
 
     public function setGenerator($generator)
@@ -125,6 +149,7 @@ class GeoPattern
         $hueOffset = $this->map($this->hexVal(14, 3), 0, 4095, 0, 359);
         $satOffset = $this->hexVal(17, 1);
         $baseColor = $this->hexToHSL($this->baseColor);
+        $color     = $this->color;
 
         $baseColor['h'] = $baseColor['h'] - $hueOffset;
 
@@ -135,7 +160,10 @@ class GeoPattern
             $baseColor['s'] = $baseColor['s'] - $satOffset/100;
         }
 
-        $rgb = $this->hslToRGB($baseColor['h'], $baseColor['s'], $baseColor['l']);
+        if (isset($color))
+            $rgb = $this->hexToRGB($color);
+        else
+            $rgb = $this->hslToRGB($baseColor['h'], $baseColor['s'], $baseColor['l']);
 
         $this->svg->addRectangle(0, 0, "100%", "100%", array('fill' => "rgb({$rgb['r']}, {$rgb['g']}, {$rgb['b']})"));
     }
