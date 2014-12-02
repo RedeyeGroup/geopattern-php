@@ -13,7 +13,7 @@ See the [GitHub Guides](http://guides.github.com) site as an example of what thi
 
 Add this line to the require section of your composer.json file:
 
-    "mauris/geopattern": "1.0.*"
+    "redeyeventures/geopattern": "1.2.*"
 
 And then run:
 
