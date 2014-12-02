@@ -9,11 +9,6 @@
             "name": "Anand Capur",
             "email": "anand@redeyeventures.com",
             "homepage": "http://redeyeventures.com"
-        },
-        {
-            "name": "sam Yong",
-            "email": "sam@mauris.sg",
-            "homepage": "http://mauris.sg"
         }
     ],
     "require":{
