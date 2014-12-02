@@ -1,5 +1,5 @@
 {
-    "name": "mauris/geopattern",
+    "name": "redeyeventures/geopattern",
     "description": "Generate beautiful SVG patterns.",
     "type": "library",
     "keywords": ["laravel", "svg", "pattern", "geometric", "background"],
@@ -16,6 +16,9 @@
             "homepage": "http://mauris.sg"
         }
     ],
+    "require":{
+        "php": ">=5.3.3"
+    },
     "support": {
         "source": "https://github.com/mauris/geopattern-php",
         "issues": "https://github.com/mauris/geopattern-php/issues"
