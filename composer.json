@@ -15,8 +15,8 @@
         "php": ">=5.3.3"
     },
     "support": {
-        "source": "https://github.com/mauris/geopattern-php",
-        "issues": "https://github.com/mauris/geopattern-php/issues"
+        "source": "https://github.com/redeyeventures/geopattern-php",
+        "issues": "https://github.com/redeyeventures/geopattern-php/issues"
     },
     "autoload": {
         "psr-4": {
