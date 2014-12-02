@@ -40,7 +40,7 @@ class GeoPattern
     const OPACITY_MIN = '0.02';
     const OPACITY_MAX = '0.15';
 
-    public function __construct ($options = array())
+    public function __construct($options = array())
     {
         // Set string if provided. If not, set default.
         if (isset($options['string'])) {
@@ -1289,7 +1289,7 @@ class GeoPattern
         return array('h' => $h, 's' => $s, 'l' => $l);
     }
 
-    protected function hslToRGB ($h, $s, $l)
+    protected function hslToRGB($h, $s, $l)
     {
         $h += 360;
         $c = (1 - abs(2 * $l - 1)) * $s;
