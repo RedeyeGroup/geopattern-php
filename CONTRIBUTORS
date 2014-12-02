@@ -1,0 +1,18 @@
+# This is the official list of people who can contribute
+# (and typically have contributed) code to the Go repository.
+# The AUTHORS file lists the copyright holders; this file
+# lists people.
+#
+# Names should be added to this file like so:
+#     Name <email address>
+#
+# An entry with two email addresses specifies that the
+# first address should be used in the submit logs and
+# that the second address should be recognized as the
+# same person when interacting with.
+#
+# Please keep the list sorted.
+
+Albert Bakker <hello@abbert.nl>
+Anand Capur <me@anand.io>
+Sam-Mauris Yong <sam@mauris.sg>
