@@ -142,20 +142,26 @@ class GeoPattern {
     }
 
     // Generators
+    public function generateColors(){
+      $hueOffset = $this->map($this->hexVal(14, 3), 0, 4095, 0, 359);
+      $satOffset = $this->hexVal(17, 1);
+      $baseColor = $this->hexToHSL($this->baseColor);
+
+      $baseColor['h'] = $baseColor['h'] - $hueOffset;
+
+
+      if ($satOffset % 2 == 0)
+          $baseColor['s'] = $baseColor['s'] + $satOffset/100;
+      else
+          $baseColor['s'] = $baseColor['s'] - $satOffset/100;
+
+      return $baseColor;
+    }
+
     protected function generateBackground()
     {
-        $hueOffset = $this->map($this->hexVal(14, 3), 0, 4095, 0, 359);
-        $satOffset = $this->hexVal(17, 1);
-        $baseColor = $this->hexToHSL($this->baseColor);
+        $baseColor = $this->generateColors();
         $color     = $this->color;
-
-        $baseColor['h'] = $baseColor['h'] - $hueOffset;
-
-
-        if ($satOffset % 2 == 0)
-            $baseColor['s'] = $baseColor['s'] + $satOffset/100;
-        else
-            $baseColor['s'] = $baseColor['s'] - $satOffset/100;
 
         if (isset($color))
             $rgb = $this->hexToRGB($color);
