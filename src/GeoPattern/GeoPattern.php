@@ -155,6 +155,8 @@ class GeoPattern {
       else
           $baseColor['s'] = $baseColor['s'] - $satOffset/100;
 
+      $baseColor['rgb'] = $this->hslToRGB($baseColor['h'], $baseColor['s'], $baseColor['l']);
+
       return $baseColor;
     }
 
