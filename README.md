@@ -11,13 +11,11 @@ See the [GitHub Guides](http://guides.github.com) site as an example of what thi
 
 ## Installation
 
-Add this line to the require section of your composer.json file:
+Run this command in your root project:
 
-    "redeyeventures/geopattern": "1.1.*"
-
-And then run:
-
-    $ composer update
+```sh
+composer require redeyeventures/geopattern
+```
 
 ## Installation (without composer)
 
